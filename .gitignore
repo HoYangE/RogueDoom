@@ -1,0 +1,15 @@
+RogueDoom/.vs/
+RogueDoom/.idea/
+RogueDoom/Binaries/
+RogueDoom/Build/
+RogueDoom/DerivedDataCache/
+RogueDoom/Intermediate/
+RogueDoom/Saved/
+RogueDoom/RogueDoom.sln
+RogueDoom/RogueDoom.sln.DotSettings.user
+RogueDoom/Plugins/
+!Config/
+!Content/
+!Source/
+!RogueDoom.uproject
+*_BuiltData.uasset
