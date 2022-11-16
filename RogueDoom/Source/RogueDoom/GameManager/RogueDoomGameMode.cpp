@@ -12,4 +12,6 @@ ARogueDoomGameMode::ARogueDoomGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+	
+	//DefaultPawnClass = APlayerCharacter::StaticClass();
 }

@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "RogueDoom/GameManager/RogueDoom.h"
 #include "Weapon/GunWeapon.h"
 
 #pragma region Init
@@ -49,11 +50,7 @@ void APlayerCharacter::InitCamera()
 }
 void APlayerCharacter::InitWeapon()
 {
-	GunWeapon = CreateDefaultSubobject<URifleWeapon>(TEXT("GunWeapon"));
-	GunWeapon->SetupAttachment(GetMesh(),TEXT("RightHandSocket"));	
-	
-	GunWeapon->InitSetting();
-	GunWeapon->SetRelativeLocationAndRotation(GunWeapon->Data.Transform.GetLocation(), GunWeapon->Data.Transform.GetRotation());
+
 }
 void APlayerCharacter::InitSetting()
 {
@@ -78,9 +75,7 @@ void APlayerCharacter::InitSetting()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	GunWeapon->SetSkeletalMesh(GunWeapon->Data.Mesh);
-
-	//GunWeapon->Using(FTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(0.0f, 0.0f, 0.0f), FVector(1.0f, 1.0f, 1.0f)));
+	
 }
 void APlayerCharacter::Tick(float DeltaTime)
 {

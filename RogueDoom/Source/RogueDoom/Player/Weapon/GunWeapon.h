@@ -8,7 +8,7 @@
 
 #include "GunWeapon.generated.h"
 
-class IAccessoryInterface;
+class UGunWeapon;
 
 USTRUCT(Atomic, BlueprintType)
 struct FGunData
@@ -30,29 +30,37 @@ public:
 };
 
 UCLASS()
+class ROGUEDOOM_API AWeapon : public AActor
+{
+	GENERATED_BODY()
+public:
+	AWeapon();
+	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UGunWeapon* GunWeapon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UAccessoryDecorator* Accessory;
+public:
+	//virtual void Fire(const FTransform Muzzle);
+};
+
+UCLASS()
 class ROGUEDOOM_API UGunWeapon : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
-	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGunData Data;
-	UPROPERTY()
-	TScriptInterface<IAccessoryInterface> Accessory;
-	bool ShootAble = true;
-	
+
 private:
+	bool ShootAble = true;
 	FTimerHandle ShootTimerHandle;
 	
 public:
-	virtual void BeginPlay() override
-	{
-		Super::BeginPlay();
-		Accessory = NewObject<ABottomAngledGrip>(NewObject<ATopRedDotScope>(NewObject<AAccessoryDecorator>(NewObject<AAccessory>())));
-		UE_LOG(LogTemp, Warning, TEXT("BeginPlay Price: %d"), Accessory->Price());
-	}
-	virtual void InitSetting() PURE_VIRTUAL(UGunWeapon::InitSetting,);
-	virtual void Using(const FTransform Muzzle);
+	virtual void InitSetting(){};
+	virtual void Display() PURE_VIRTUAL(UGunWeapon::InitSetting,);
+	virtual void Fire(const FTransform Muzzle);
 };
 
 UCLASS()
@@ -61,8 +69,11 @@ class ROGUEDOOM_API URifleWeapon final : public UGunWeapon
 	GENERATED_BODY()
 
 public:
-	URifleWeapon();
 	
+public:	
+	URifleWeapon();
+
 	virtual void InitSetting() override;
-	virtual void Using(const FTransform Muzzle) override;
+	virtual void Display() override{};
+	virtual void Fire(const FTransform Muzzle) override;
 };

@@ -4,103 +4,103 @@
 
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
-#include "GameFramework/Actor.h"
-#include "UObject/Interface.h"
 
 #include "Accessory.generated.h"
 
-UINTERFACE()
-class UAccessoryInterface : public UInterface
-{
-	GENERATED_BODY()	
-};
-class IAccessoryInterface
-{
-	GENERATED_BODY()
-public:
-	virtual int Price() = 0;
-};
-
 UCLASS()
-class ROGUEDOOM_API AAccessory : public AActor, public IAccessoryInterface
+class ROGUEDOOM_API UAccessoryDecorator : public UStaticMeshComponent
 {
 	GENERATED_BODY()
-public:
-	virtual int Price() override{return 500;}
-};
-
-UCLASS()
-class ROGUEDOOM_API AAccessoryDecorator : public AActor, public IAccessoryInterface
-{
-	GENERATED_BODY()
-private:
+protected:
 	UPROPERTY()
-	TScriptInterface<IAccessoryInterface> Accessory;
+	UStaticMesh* Accessory;
 	
 public:
-	AAccessoryDecorator()=default;//{Accessory = NewObject<AAccessory>();}
-	// explicit: 원하지 않는 형변환 제한하는 키워드
-	explicit AAccessoryDecorator(const TScriptInterface<IAccessoryInterface> Accessory):Accessory(Accessory){}
-	virtual int Price() override{if(Accessory) return Accessory->Price(); return 0;}
+	virtual UStaticMesh* GetMesh() PURE_VIRTUAL(UAccessoryDecorator::GetMesh, return Accessory;)
+	virtual FName GetSocketName() PURE_VIRTUAL(UAccessoryDecorator::GetSocketName, return FName();)
 };
 
 UCLASS()
-class ROGUEDOOM_API ATopRedDotScope final : public AAccessoryDecorator
+class ROGUEDOOM_API UTopRedDotScope final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	ATopRedDotScope() = default;
-	explicit ATopRedDotScope(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 100;}
+	UTopRedDotScope()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body57.GUN_PARTS_1____Body57")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Top_RedDotScope_1";}
 };
 UCLASS()
-class ROGUEDOOM_API ATopRedDotScope2 final : public AAccessoryDecorator
+class ROGUEDOOM_API UTopRedDotScope2 final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	ATopRedDotScope2() = default;
-	explicit ATopRedDotScope2(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 130;}
+	UTopRedDotScope2()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body62.GUN_PARTS_1____Body62")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Top_RedDotScope_2";}
 };
 UCLASS()
-class ROGUEDOOM_API ATopRedDotScope3 final : public AAccessoryDecorator
+class ROGUEDOOM_API UTopRedDotScope3 final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	ATopRedDotScope3() = default;
-	explicit ATopRedDotScope3(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 315;}
+	UTopRedDotScope3()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body17.GUN_PARTS_1____Body17")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Top_RedDotScope_3";}
 };
 UCLASS()
-class ROGUEDOOM_API ABottomAngledGrip final : public AAccessoryDecorator
+class ROGUEDOOM_API UBottomAngledGrip final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	ABottomAngledGrip() = default;
-	explicit ABottomAngledGrip(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 250;}
+	UBottomAngledGrip()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body6.GUN_PARTS_1____Body6")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Bottom_AngledGrip";}
 };
 UCLASS()
-class ROGUEDOOM_API AForwardFlashHider final : public AAccessoryDecorator
+class ROGUEDOOM_API UForwardFlashHider final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	AForwardFlashHider() = default;
-	explicit AForwardFlashHider(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 305;}
+	UForwardFlashHider()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body1.GUN_PARTS_1____Body1")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Forward_FlashHider";}
 };
 UCLASS()
-class ROGUEDOOM_API AForwardSilencer final : public AAccessoryDecorator
+class ROGUEDOOM_API UForwardSilencer final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	AForwardSilencer() = default;
-	explicit AForwardSilencer(const TScriptInterface<IAccessoryInterface> Accessory):AAccessoryDecorator::AAccessoryDecorator(Accessory){}
-	virtual int Price() override{return AAccessoryDecorator::Price() + 100;}
+	UForwardSilencer()
+	{
+		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body58_1.GUN_PARTS_1____Body58_1")); SM_Mesh.Succeeded())
+			Accessory = SM_Mesh.Object;
+	}
+	virtual UStaticMesh* GetMesh() override{return Accessory;}
+	virtual FName GetSocketName() override{return "Forward_Silencer";}
 };

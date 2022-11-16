@@ -12,16 +12,13 @@ class ROGUEDOOM_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	
-private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* MainCamera;
+private:
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	class UGunWeapon* GunWeapon;
 public:
 
 private:
