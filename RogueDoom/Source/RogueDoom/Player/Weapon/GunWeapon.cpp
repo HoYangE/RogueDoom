@@ -3,6 +3,7 @@
 
 #include "GunWeapon.h"
 
+#include "Accessory.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
 
 #pragma region UGunWeapon
@@ -30,7 +31,7 @@ URifleWeapon::URifleWeapon()
 	if(const ConstructorHelpers::FObjectFinder<USkeletalMesh> SM_GunBody(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Assault_Rifle_A.Assault_Rifle_A")); SM_GunBody.Succeeded())
 	{
 		Data.Mesh = SM_GunBody.Object;
-	}
+	}	
 }
 void URifleWeapon::InitSetting()
 {
@@ -43,5 +44,6 @@ void URifleWeapon::InitSetting()
 void URifleWeapon::Using(const FTransform Muzzle)
 {
 	UGunWeapon::Using(Muzzle);
+	
 }
 #pragma endregion URifleWeapon

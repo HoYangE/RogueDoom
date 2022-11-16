@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Accessory.h"
 #include "Components/SkeletalMeshComponent.h"
 
 #include "GunWeapon.generated.h"
+
+class IAccessoryInterface;
 
 USTRUCT(Atomic, BlueprintType)
 struct FGunData
@@ -34,12 +37,20 @@ class ROGUEDOOM_API UGunWeapon : public USkeletalMeshComponent
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGunData Data;
+	UPROPERTY()
+	TScriptInterface<IAccessoryInterface> Accessory;
 	bool ShootAble = true;
 	
 private:
 	FTimerHandle ShootTimerHandle;
 	
 public:
+	virtual void BeginPlay() override
+	{
+		Super::BeginPlay();
+		Accessory = NewObject<ABottomAngledGrip>(NewObject<ATopRedDotScope>(NewObject<AAccessoryDecorator>(NewObject<AAccessory>())));
+		UE_LOG(LogTemp, Warning, TEXT("BeginPlay Price: %d"), Accessory->Price());
+	}
 	virtual void InitSetting() PURE_VIRTUAL(UGunWeapon::InitSetting,);
 	virtual void Using(const FTransform Muzzle);
 };
