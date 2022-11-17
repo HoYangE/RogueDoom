@@ -8,8 +8,8 @@
 
 #include "GunWeapon.generated.h"
 
-class UGunWeapon;
 
+class UGunWeapon;
 USTRUCT(Atomic, BlueprintType)
 struct FGunData
 {
@@ -29,6 +29,20 @@ public:
 	int CurrentBullet;
 };
 
+UINTERFACE()
+class UWeaponInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+class IWeaponInterface
+{
+	GENERATED_BODY()
+public:
+	virtual void InitSetting() = 0;
+	virtual void Display() = 0;
+	virtual void Fire(const FTransform Muzzle) = 0;
+};
+
 UCLASS()
 class ROGUEDOOM_API AWeapon : public AActor
 {
@@ -39,14 +53,18 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UGunWeapon* GunWeapon;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	UAccessoryDecorator* Accessory;
+	UPROPERTY()
+	UAccessoryDecorator* ScopeAccessory;
+	UPROPERTY()
+	UAccessoryDecorator* LeftHandAccessory;
+	UPROPERTY()
+	UAccessoryDecorator* MuzzleAccessory;
 public:
 	//virtual void Fire(const FTransform Muzzle);
 };
 
 UCLASS()
-class ROGUEDOOM_API UGunWeapon : public USkeletalMeshComponent
+class ROGUEDOOM_API UGunWeapon : public USkeletalMeshComponent, public IWeaponInterface
 {
 	GENERATED_BODY()
 public:
@@ -58,9 +76,9 @@ private:
 	FTimerHandle ShootTimerHandle;
 	
 public:
-	virtual void InitSetting(){};
-	virtual void Display() PURE_VIRTUAL(UGunWeapon::InitSetting,);
-	virtual void Fire(const FTransform Muzzle);
+	virtual void InitSetting() override {}
+	virtual void Display() override {}
+	virtual void Fire(const FTransform Muzzle) override;
 };
 
 UCLASS()
@@ -74,6 +92,6 @@ public:
 	URifleWeapon();
 
 	virtual void InitSetting() override;
-	virtual void Display() override{};
+	virtual void Display() override {}
 	virtual void Fire(const FTransform Muzzle) override;
 };

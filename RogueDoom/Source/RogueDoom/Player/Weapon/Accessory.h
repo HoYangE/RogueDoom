@@ -7,8 +7,21 @@
 
 #include "Accessory.generated.h"
 
+UINTERFACE()
+class UAccessoryInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+class IAccessoryInterface
+{
+	GENERATED_BODY()
+public:
+	virtual UStaticMesh* GetMesh() = 0;
+	virtual FName GetSocketName() = 0;
+};
+
 UCLASS()
-class ROGUEDOOM_API UAccessoryDecorator : public UStaticMeshComponent
+class ROGUEDOOM_API UAccessoryDecorator : public UStaticMeshComponent, public IAccessoryInterface
 {
 	GENERATED_BODY()
 protected:
@@ -16,8 +29,8 @@ protected:
 	UStaticMesh* Accessory;
 	
 public:
-	virtual UStaticMesh* GetMesh() PURE_VIRTUAL(UAccessoryDecorator::GetMesh, return Accessory;)
-	virtual FName GetSocketName() PURE_VIRTUAL(UAccessoryDecorator::GetSocketName, return FName();)
+	virtual UStaticMesh* GetMesh() override { return Accessory; }
+	virtual FName GetSocketName() override { return FName(""); }
 };
 
 UCLASS()

@@ -17,9 +17,20 @@ AWeapon::AWeapon()
 
 	GunWeapon->SetSkeletalMesh(GunWeapon->Data.Mesh);
 
-	Accessory = CreateDefaultSubobject<UTopRedDotScope>(TEXT("Accessory"));
-	Accessory->SetupAttachment(GunWeapon, Accessory->GetSocketName());
-	Accessory->SetStaticMesh(Accessory->GetMesh());
+	ScopeAccessory = CreateDefaultSubobject<UTopRedDotScope>(TEXT("ScopeAccessory"));
+	ScopeAccessory->SetupAttachment(GunWeapon, ScopeAccessory->GetSocketName());
+	ScopeAccessory->SetStaticMesh(ScopeAccessory->GetMesh());
+	ScopeAccessory->SetCollisionProfileName(TEXT("NoCollision"));
+	
+	LeftHandAccessory = CreateDefaultSubobject<UBottomAngledGrip>(TEXT("LeftHandAccessory"));
+	LeftHandAccessory->SetupAttachment(GunWeapon, LeftHandAccessory->GetSocketName());
+	LeftHandAccessory->SetStaticMesh(LeftHandAccessory->GetMesh());
+	LeftHandAccessory->SetCollisionProfileName(TEXT("NoCollision"));
+
+	MuzzleAccessory = CreateDefaultSubobject<UForwardSilencer>(TEXT("MuzzleAccessory"));
+	MuzzleAccessory->SetupAttachment(GunWeapon, MuzzleAccessory->GetSocketName());
+	MuzzleAccessory->SetStaticMesh(MuzzleAccessory->GetMesh());
+	MuzzleAccessory->SetCollisionProfileName(TEXT("NoCollision"));
 
 }
 void AWeapon::BeginPlay()

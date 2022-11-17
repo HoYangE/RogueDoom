@@ -17,7 +17,6 @@ APlayerCharacter::APlayerCharacter()
 
 	InitMesh();
 	InitCamera();
-	InitWeapon();
 	InitSetting();
 }
 void APlayerCharacter::InitMesh()const
@@ -50,7 +49,9 @@ void APlayerCharacter::InitCamera()
 }
 void APlayerCharacter::InitWeapon()
 {
-
+	const auto SocketTransform = GetMesh()->GetSocketTransform(TEXT("RightHandSocket"));
+	Weapon = GetWorld()->SpawnActor(AWeapon::StaticClass(),&SocketTransform);
+	Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("RightHandSocket"));
 }
 void APlayerCharacter::InitSetting()
 {
@@ -75,6 +76,8 @@ void APlayerCharacter::InitSetting()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	InitWeapon();
 	
 }
 void APlayerCharacter::Tick(float DeltaTime)
