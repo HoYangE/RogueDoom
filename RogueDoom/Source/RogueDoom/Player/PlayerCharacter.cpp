@@ -58,10 +58,10 @@ void APlayerCharacter::InitSetting()
 	GetCapsuleComponent()->InitCapsuleSize(40.f, 90.0f);
 	
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 
 	GetCharacterMovement()->JumpZVelocity = 700.f;
@@ -101,19 +101,29 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Move Right / Left", this, &APlayerCharacter::MoveRight);
 
 	//MouseAxis
-	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APlayerCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APlayerCharacter::LookUpAtRate);
 }
 #pragma endregion Virtual
 
 #pragma region Movement
 void APlayerCharacter::TurnAtRate(float Rate)
 {
-	AddControllerYawInput(Rate * GetWorld()->GetDeltaSeconds());
+	if(GetCharacterMovement()->Velocity == FVector::ZeroVector)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		bUseControllerRotationYaw = false;
+	}
+	else
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		bUseControllerRotationYaw = true;
+	}
+	AddControllerYawInput(Rate * GetWorld()->GetDeltaSeconds() * 100.0f);
 }
 void APlayerCharacter::LookUpAtRate(float Rate)
 {
-	AddControllerPitchInput(Rate * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(Rate * GetWorld()->GetDeltaSeconds() * 100.0f);
 }
 void APlayerCharacter::MoveForward(float Value)
 {

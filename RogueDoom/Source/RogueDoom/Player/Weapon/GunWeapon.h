@@ -60,7 +60,8 @@ public:
 	UPROPERTY()
 	UAccessoryDecorator* MuzzleAccessory;
 public:
-	//virtual void Fire(const FTransform Muzzle);
+	void ChangeAccessory(UAccessoryDecorator* Socket, const TSubclassOf<UAccessoryDecorator> Decorator)const;
+
 };
 
 UCLASS()

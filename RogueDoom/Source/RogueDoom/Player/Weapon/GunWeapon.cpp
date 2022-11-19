@@ -5,41 +5,43 @@
 
 #include "Accessory.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
-#include "RogueDoom/Player/PlayerCharacter.h"
 
-#pragma region UGunWeapon
+#pragma region AWeapon
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	GunWeapon = CreateDefaultSubobject<URifleWeapon>(TEXT("GunWeaponMesh"));
-	GunWeapon->SetupAttachment(RootComponent);
+	SetRootComponent(GunWeapon);
 
 	GunWeapon->SetSkeletalMesh(GunWeapon->Data.Mesh);
 
-	ScopeAccessory = CreateDefaultSubobject<UTopRedDotScope>(TEXT("ScopeAccessory"));
-	ScopeAccessory->SetupAttachment(GunWeapon, ScopeAccessory->GetSocketName());
-	ScopeAccessory->SetStaticMesh(ScopeAccessory->GetMesh());
-	ScopeAccessory->SetCollisionProfileName(TEXT("NoCollision"));
+	ScopeAccessory = CreateDefaultSubobject<UAccessoryDecorator>(TEXT("ScopeAccessory"));
+	ScopeAccessory->SetCollisionProfileName(TEXT("NoCollision"));	
+	ChangeAccessory(ScopeAccessory, UTopRedDotScope::StaticClass());
 	
-	LeftHandAccessory = CreateDefaultSubobject<UBottomAngledGrip>(TEXT("LeftHandAccessory"));
-	LeftHandAccessory->SetupAttachment(GunWeapon, LeftHandAccessory->GetSocketName());
-	LeftHandAccessory->SetStaticMesh(LeftHandAccessory->GetMesh());
+	LeftHandAccessory = CreateDefaultSubobject<UAccessoryDecorator>(TEXT("LeftHandAccessory"));
 	LeftHandAccessory->SetCollisionProfileName(TEXT("NoCollision"));
+	ChangeAccessory(LeftHandAccessory, UBottomAngledGrip::StaticClass());
 
-	MuzzleAccessory = CreateDefaultSubobject<UForwardSilencer>(TEXT("MuzzleAccessory"));
-	MuzzleAccessory->SetupAttachment(GunWeapon, MuzzleAccessory->GetSocketName());
-	MuzzleAccessory->SetStaticMesh(MuzzleAccessory->GetMesh());
+	MuzzleAccessory = CreateDefaultSubobject<UAccessoryDecorator>(TEXT("MuzzleAccessory"));
 	MuzzleAccessory->SetCollisionProfileName(TEXT("NoCollision"));
-
+	ChangeAccessory(MuzzleAccessory, UForwardSilencer::StaticClass());
 }
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
-#pragma endregion UGunWeapon
+void AWeapon::ChangeAccessory(UAccessoryDecorator* Socket, const TSubclassOf<UAccessoryDecorator> Decorator)const
+{
+	Socket->SetupAttachment(GunWeapon, Decorator->GetDefaultObject<UAccessoryDecorator>()->GetSocketName());
+	Socket->SetStaticMesh(Decorator->GetDefaultObject<UAccessoryDecorator>()->GetMesh());
+}
+#pragma endregion AWeapon
 
+
+#pragma region UGunWeapon
 void UGunWeapon::Fire(const FTransform Muzzle)
 {
 	if(ShootAble)
@@ -56,6 +58,8 @@ void UGunWeapon::Fire(const FTransform Muzzle)
 		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]{ShootAble = true;}, Data.DelayTime, false);
 	}
 }
+#pragma endregion UGunWeapon
+
 
 #pragma region URifleWeapon
 URifleWeapon::URifleWeapon()
