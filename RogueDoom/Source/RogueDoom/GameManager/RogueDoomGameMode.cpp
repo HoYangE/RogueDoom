@@ -6,12 +6,9 @@
 
 ARogueDoomGameMode::ARogueDoomGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APlayerCharacter> PlayerPawnBPClass(TEXT("/Game/BluePrint/BP_PlayerCharacter.BP_PlayerCharacter_C"));
-	if (PlayerPawnBPClass.Class != NULL)
+	if (const ConstructorHelpers::FClassFinder<APlayerCharacter> PlayerPawnBPClass(TEXT("/Game/BluePrint/BP_PlayerCharacter.BP_PlayerCharacter_C")); PlayerPawnBPClass.Class)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-	
+	}	
 	//DefaultPawnClass = APlayerCharacter::StaticClass();
 }

@@ -34,10 +34,13 @@ private:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void TurnAtRate(float Rate);
+	void LookUpAtRate(float Rate);
+	void VelocityTurnAtRate(const bool bZeroVector);
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void TurnAtRate(float Rate);
-	void LookUpAtRate(float Rate);
+
 	
 };

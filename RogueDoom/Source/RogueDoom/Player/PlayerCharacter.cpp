@@ -27,7 +27,7 @@ void APlayerCharacter::InitMesh()const
 		GetMesh()->SetSkeletalMesh(SK_Player.Object);
 	}
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	if(ConstructorHelpers::FClassFinder<UAnimInstance> AI_Player(TEXT("/Game/Animation/UE5/AB_Quinn_Anim.AB_Quinn_Anim_C")); AI_Player.Succeeded())
+	if(ConstructorHelpers::FClassFinder<UAnimInstance> AI_Player(TEXT("/Game/Animation/UE5/AnimBP/AB_Quinn_Anim.AB_Quinn_Anim_C")); AI_Player.Succeeded())
 	{
 		GetMesh()->SetAnimClass(AI_Player.Class);
 	}
@@ -109,22 +109,20 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 #pragma region Movement
 void APlayerCharacter::TurnAtRate(float Rate)
 {
-	if(GetCharacterMovement()->Velocity == FVector::ZeroVector)
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-		bUseControllerRotationYaw = false;
-	}
-	else
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-		bUseControllerRotationYaw = true;
-	}
+	VelocityTurnAtRate(GetCharacterMovement()->Velocity == FVector::ZeroVector);	
 	AddControllerYawInput(Rate * GetWorld()->GetDeltaSeconds() * 100.0f);
 }
 void APlayerCharacter::LookUpAtRate(float Rate)
 {
 	AddControllerPitchInput(Rate * GetWorld()->GetDeltaSeconds() * 100.0f);
 }
+void APlayerCharacter::VelocityTurnAtRate(const bool bZeroVector)
+{
+	GetCharacterMovement()->bOrientRotationToMovement = bZeroVector;
+	bUseControllerRotationYaw = !bZeroVector;
+}
+
+
 void APlayerCharacter::MoveForward(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))

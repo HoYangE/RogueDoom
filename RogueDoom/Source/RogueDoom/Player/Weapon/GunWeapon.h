@@ -96,3 +96,18 @@ public:
 	virtual void Display() override {}
 	virtual void Fire(const FTransform Muzzle) override;
 };
+
+UCLASS()
+class ROGUEDOOM_API UPistolWeapon final : public UGunWeapon
+{
+	GENERATED_BODY()
+
+public:
+	
+public:	
+	UPistolWeapon();
+
+	virtual void InitSetting() override;
+	virtual void Display() override {}
+	virtual void Fire(const FTransform Muzzle) override;
+};
