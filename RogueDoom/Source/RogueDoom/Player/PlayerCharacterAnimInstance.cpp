@@ -5,11 +5,15 @@
 
 #include "PlayerCharacter.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "RogueDoom/GameManager/RogueDoom.h"
 
 UPlayerCharacterAnimInstance::UPlayerCharacterAnimInstance()
 {
-	IsInAir = false;
-	WeaponType = EWeaponType::Rifle;
+	Data.IsInAir = false;
+	Data.WeaponType = EWeaponType::Rifle;
+	Data.ForwardInputAxis = 0.0f;
+	Data.RightInputAxis = 0.0f;
+	Data.SpeedType = ESpeedType::Walk;
 }
 
 void UPlayerCharacterAnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
@@ -17,8 +21,8 @@ void UPlayerCharacterAnimInstance::NativeUpdateAnimation(const float DeltaSecond
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	
 	if(const auto Pawn = TryGetPawnOwner(); ::IsValid(Pawn))
-	{		
+	{
 		if(const auto Character = Cast<APlayerCharacter>(Pawn); Character)
-			IsInAir = Character->GetMovementComponent()->IsFalling();
+			Data.IsInAir = Character->GetMovementComponent()->IsFalling();
 	}
 }

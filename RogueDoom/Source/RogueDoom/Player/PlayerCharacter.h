@@ -18,6 +18,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* MainCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UPlayerCharacterAnimInstance* AnimInstance;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	AActor* Weapon;
 private:
@@ -30,6 +33,8 @@ private:
 	void InitWeapon();
 	void InitCamera();
 	void InitSetting();
+
+	virtual void PostInitializeComponents() override;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

@@ -3,6 +3,7 @@
 
 #include "PlayerCharacter.h"
 
+#include "PlayerCharacterAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -70,6 +71,11 @@ void APlayerCharacter::InitSetting()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 }
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AnimInstance = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+}
 #pragma endregion Init
 
 #pragma region Virtual
@@ -122,9 +128,9 @@ void APlayerCharacter::VelocityTurnAtRate(const bool bZeroVector)
 	bUseControllerRotationYaw = !bZeroVector;
 }
 
-
 void APlayerCharacter::MoveForward(float Value)
 {
+	AnimInstance->Data.ForwardInputAxis = Value;
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -136,6 +142,7 @@ void APlayerCharacter::MoveForward(float Value)
 }
 void APlayerCharacter::MoveRight(float Value)
 {
+	AnimInstance->Data.RightInputAxis = Value;
 	if ( (Controller != nullptr) && (Value != 0.0f) )
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
