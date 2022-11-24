@@ -38,9 +38,10 @@ class IWeaponInterface
 {
 	GENERATED_BODY()
 public:
-	virtual void InitSetting() = 0;
+	virtual FGunData GetData() = 0;
 	virtual void Display() = 0;
 	virtual void Fire(const FTransform Muzzle) = 0;
+	virtual void Reload() = 0;
 };
 
 UCLASS()
@@ -59,9 +60,9 @@ public:
 	UAccessoryDecorator* LeftHandAccessory;
 	UPROPERTY()
 	UAccessoryDecorator* MuzzleAccessory;
+	
 public:
 	void ChangeAccessory(UAccessoryDecorator* Socket, const TSubclassOf<UAccessoryDecorator> Decorator)const;
-
 };
 
 UCLASS()
@@ -77,9 +78,10 @@ private:
 	FTimerHandle ShootTimerHandle;
 	
 public:
-	virtual void InitSetting() override {}
+	virtual FGunData GetData() override {return FGunData{};}
 	virtual void Display() override {}
 	virtual void Fire(const FTransform Muzzle) override;
+	virtual void Reload() override {}
 };
 
 UCLASS()
@@ -92,9 +94,10 @@ public:
 public:	
 	URifleWeapon();
 
-	virtual void InitSetting() override;
-	virtual void Display() override {}
+	virtual FGunData GetData() override;
+	virtual void Display() override;
 	virtual void Fire(const FTransform Muzzle) override;
+	virtual void Reload() override {}
 };
 
 UCLASS()
@@ -107,7 +110,8 @@ public:
 public:	
 	UPistolWeapon();
 
-	virtual void InitSetting() override;
-	virtual void Display() override {}
+	virtual FGunData GetData() override;
+	virtual void Display() override;
 	virtual void Fire(const FTransform Muzzle) override;
+	virtual void Reload() override {}
 };

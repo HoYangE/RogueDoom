@@ -47,5 +47,10 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
+	void Fire();
+	void Reload();
+	void Rifle();
+	void Pistol();
+	void ChangeWeapon(const class AWeapon* WeaponClass)const;
 	
 };

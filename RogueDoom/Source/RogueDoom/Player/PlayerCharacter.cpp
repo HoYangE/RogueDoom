@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
+#include "RogueDoom/GameManager/RogueDoomGameInstance.h"
 #include "Weapon/GunWeapon.h"
 
 #pragma region Init
@@ -78,10 +79,14 @@ void APlayerCharacter::PostInitializeComponents()
 }
 #pragma endregion Init
 
+
 #pragma region Virtual
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if(const auto GameInstance = Cast<URogueDoomGameInstance>(GetGameInstance()); GameInstance)
+		GameInstance->SetPlayerCharacter(this);
 	
 	InitWeapon();
 	
@@ -98,7 +103,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//KeyboardAction
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::Fire);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);
+	
+	PlayerInputComponent->BindAction("Rifle", IE_Pressed, this, &APlayerCharacter::Rifle);
+	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &APlayerCharacter::Pistol);
 	//MouseAction
 	//...
 	
@@ -111,6 +120,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APlayerCharacter::LookUpAtRate);
 }
 #pragma endregion Virtual
+
 
 #pragma region Movement
 void APlayerCharacter::TurnAtRate(float Rate)
@@ -153,3 +163,43 @@ void APlayerCharacter::MoveRight(float Value)
 	}
 }
 #pragma endregion Movement
+
+
+#pragma region Weapon
+void APlayerCharacter::Fire()
+{
+	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+		if(WeaponClass->GunWeapon->DoesSocketExist(TEXT("MuzzleSocket")))
+			WeaponClass->GunWeapon->Fire(WeaponClass->GunWeapon->GetSocketTransform(TEXT("MuzzleSocket")) + WeaponClass->MuzzleAccessory->GetAccessoryData().Transform);
+}
+void APlayerCharacter::Reload()
+{
+	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+		WeaponClass->GunWeapon->Reload();
+}
+void APlayerCharacter::Rifle()
+{
+	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+	{
+		AnimInstance->Data.WeaponType = EWeaponType::Rifle;
+		WeaponClass->GunWeapon->Data = URifleWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();		
+		ChangeWeapon(WeaponClass);
+	}
+}
+void APlayerCharacter::Pistol()
+{
+	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+	{
+		AnimInstance->Data.WeaponType = EWeaponType::Pistol;
+		WeaponClass->GunWeapon->Data = UPistolWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();
+		ChangeWeapon(WeaponClass);
+	}
+}
+void APlayerCharacter::ChangeWeapon(const AWeapon* WeaponClass)const
+{
+	WeaponClass->ChangeAccessory(WeaponClass->ScopeAccessory, nullptr);
+	WeaponClass->ChangeAccessory(WeaponClass->LeftHandAccessory, nullptr);
+	WeaponClass->ChangeAccessory(WeaponClass->MuzzleAccessory, nullptr);
+	WeaponClass->GunWeapon->SetSkeletalMesh(WeaponClass->GunWeapon->Data.Mesh);
+}
+#pragma endregion Weapon

@@ -4,8 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
+#include "RogueDoom/GameManager/RogueDoom.h"
 
 #include "Accessory.generated.h"
+
+class UGunWeapon;
+USTRUCT(Atomic, BlueprintType)
+struct FAccessoryData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UStaticMesh* Mesh;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FString Info;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FTransform Transform;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName SocketName;
+};
 
 UINTERFACE()
 class UAccessoryInterface : public UInterface
@@ -16,36 +33,28 @@ class IAccessoryInterface
 {
 	GENERATED_BODY()
 public:
-	virtual UStaticMesh* GetMesh() = 0;
-	virtual FName GetSocketName() = 0;
+	virtual FAccessoryData GetAccessoryData() = 0;
 };
 
 UCLASS()
 class ROGUEDOOM_API UAccessoryDecorator : public UStaticMeshComponent, public IAccessoryInterface
 {
 	GENERATED_BODY()
-protected:
-	UPROPERTY()
-	UStaticMesh* Accessory;
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FAccessoryData Data;
 	
 public:
-	virtual UStaticMesh* GetMesh() override { return Accessory; }
-	virtual FName GetSocketName() override { return FName(""); }
+	virtual FAccessoryData GetAccessoryData() override { return Data; }
 };
 
 UCLASS()
-class ROGUEDOOM_API UTopRedDotScope final : public UAccessoryDecorator
+class ROGUEDOOM_API UTopRedDotScope1 final : public UAccessoryDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	UTopRedDotScope()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body57.GUN_PARTS_1____Body57")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Top_RedDotScope_1";}
+	virtual FAccessoryData GetAccessoryData() override;
 };
 UCLASS()
 class ROGUEDOOM_API UTopRedDotScope2 final : public UAccessoryDecorator
@@ -53,13 +62,7 @@ class ROGUEDOOM_API UTopRedDotScope2 final : public UAccessoryDecorator
 	GENERATED_BODY()
 	
 public:
-	UTopRedDotScope2()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body62.GUN_PARTS_1____Body62")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Top_RedDotScope_2";}
+	virtual FAccessoryData GetAccessoryData() override;
 };
 UCLASS()
 class ROGUEDOOM_API UTopRedDotScope3 final : public UAccessoryDecorator
@@ -67,13 +70,7 @@ class ROGUEDOOM_API UTopRedDotScope3 final : public UAccessoryDecorator
 	GENERATED_BODY()
 	
 public:
-	UTopRedDotScope3()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body17.GUN_PARTS_1____Body17")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Top_RedDotScope_3";}
+	virtual FAccessoryData GetAccessoryData() override;
 };
 UCLASS()
 class ROGUEDOOM_API UBottomAngledGrip final : public UAccessoryDecorator
@@ -81,13 +78,7 @@ class ROGUEDOOM_API UBottomAngledGrip final : public UAccessoryDecorator
 	GENERATED_BODY()
 	
 public:
-	UBottomAngledGrip()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body6.GUN_PARTS_1____Body6")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Bottom_AngledGrip";}
+	virtual FAccessoryData GetAccessoryData() override;
 };
 UCLASS()
 class ROGUEDOOM_API UForwardFlashHider final : public UAccessoryDecorator
@@ -95,13 +86,7 @@ class ROGUEDOOM_API UForwardFlashHider final : public UAccessoryDecorator
 	GENERATED_BODY()
 	
 public:
-	UForwardFlashHider()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body1.GUN_PARTS_1____Body1")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Forward_FlashHider";}
+	virtual FAccessoryData GetAccessoryData() override;
 };
 UCLASS()
 class ROGUEDOOM_API UForwardSilencer final : public UAccessoryDecorator
@@ -109,11 +94,5 @@ class ROGUEDOOM_API UForwardSilencer final : public UAccessoryDecorator
 	GENERATED_BODY()
 	
 public:
-	UForwardSilencer()
-	{
-		if(const ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Mesh(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Parts/GUN_PARTS_1____Body58_1.GUN_PARTS_1____Body58_1")); SM_Mesh.Succeeded())
-			Accessory = SM_Mesh.Object;
-	}
-	virtual UStaticMesh* GetMesh() override{return Accessory;}
-	virtual FName GetSocketName() override{return "Forward_Silencer";}
+	virtual FAccessoryData GetAccessoryData() override;
 };

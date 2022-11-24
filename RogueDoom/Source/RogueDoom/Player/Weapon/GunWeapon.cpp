@@ -12,13 +12,14 @@ AWeapon::AWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	GunWeapon = CreateDefaultSubobject<URifleWeapon>(TEXT("GunWeaponMesh"));
+	GunWeapon->Data = URifleWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();
 	SetRootComponent(GunWeapon);
 
 	GunWeapon->SetSkeletalMesh(GunWeapon->Data.Mesh);
 
 	ScopeAccessory = CreateDefaultSubobject<UAccessoryDecorator>(TEXT("ScopeAccessory"));
 	ScopeAccessory->SetCollisionProfileName(TEXT("NoCollision"));	
-	ChangeAccessory(ScopeAccessory, UTopRedDotScope::StaticClass());
+	ChangeAccessory(ScopeAccessory, UTopRedDotScope1::StaticClass());
 	
 	LeftHandAccessory = CreateDefaultSubobject<UAccessoryDecorator>(TEXT("LeftHandAccessory"));
 	LeftHandAccessory->SetCollisionProfileName(TEXT("NoCollision"));
@@ -35,10 +36,23 @@ void AWeapon::BeginPlay()
 }
 void AWeapon::ChangeAccessory(UAccessoryDecorator* Socket, const TSubclassOf<UAccessoryDecorator> Decorator)const
 {
-	if(GunWeapon->DoesSocketExist(Decorator->GetDefaultObject<UAccessoryDecorator>()->GetSocketName()))
+	if(Decorator == nullptr)
 	{
-		Socket->SetupAttachment(GunWeapon, Decorator->GetDefaultObject<UAccessoryDecorator>()->GetSocketName());
-		Socket->SetStaticMesh(Decorator->GetDefaultObject<UAccessoryDecorator>()->GetMesh());
+		Socket->SetStaticMesh(nullptr);
+		Socket->Data = FAccessoryData();
+		return;
+	}	
+	if(const auto Temp = Decorator->GetDefaultObject<UAccessoryDecorator>()->GetAccessoryData(); GunWeapon->DoesSocketExist(Temp.SocketName))
+	{
+		if(Socket->Data.SocketName == Temp.SocketName)
+		{
+			Socket->SetStaticMesh(nullptr);
+			Socket->Data = FAccessoryData();
+			return;
+		}
+		Socket->Data = Temp;
+		Socket->AttachToComponent(GunWeapon, FAttachmentTransformRules::KeepRelativeTransform, Temp.SocketName);
+		Socket->SetStaticMesh(Temp.Mesh);
 	}
 }
 #pragma endregion AWeapon
@@ -67,18 +81,22 @@ void UGunWeapon::Fire(const FTransform Muzzle)
 #pragma region URifleWeapon
 URifleWeapon::URifleWeapon()
 {
-	if(const ConstructorHelpers::FObjectFinder<USkeletalMesh> SM_GunBody(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Assault_Rifle_A.Assault_Rifle_A")); SM_GunBody.Succeeded())
-		Data.Mesh = SM_GunBody.Object;
 
+}
+FGunData URifleWeapon::GetData()
+{
+	Data.Mesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Assault_Rifle_A.Assault_Rifle_A"));
 	Data.Info = "Rifle";
 	Data.Transform = FTransform(FRotator(0, 90, 15), FVector(-7, 3, 0), FVector(1, 1, 1));
 	Data.DelayTime = 0.5f;
 	Data.MaxBullet = 30;
 	Data.CurrentBullet = Data.MaxBullet;
+	
+	return Data;
 }
-void URifleWeapon::InitSetting()
+void URifleWeapon::Display()
 {
-	UGunWeapon::InitSetting();
+
 }
 void URifleWeapon::Fire(const FTransform Muzzle)
 {
@@ -90,18 +108,22 @@ void URifleWeapon::Fire(const FTransform Muzzle)
 #pragma region UPistol
 UPistolWeapon::UPistolWeapon()
 {
-	if(const ConstructorHelpers::FObjectFinder<USkeletalMesh> SM_GunBody(TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Pistols_A.Pistols_A")); SM_GunBody.Succeeded())
-		Data.Mesh = SM_GunBody.Object;
 
+}
+FGunData UPistolWeapon::GetData()
+{
+	Data.Mesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/Weapons/Pistols_A.Pistols_A"));
 	Data.Info = "Pistol";
 	Data.Transform = FTransform(FRotator(0, 90, 15), FVector(-7, 3, 0), FVector(1, 1, 1));
 	Data.DelayTime = 0.75f;
 	Data.MaxBullet = 15;
 	Data.CurrentBullet = Data.MaxBullet;
+	
+	return Data;
 }
-void UPistolWeapon::InitSetting()
+void UPistolWeapon::Display()
 {
-	UGunWeapon::InitSetting();
+	
 }
 void UPistolWeapon::Fire(const FTransform Muzzle)
 {
