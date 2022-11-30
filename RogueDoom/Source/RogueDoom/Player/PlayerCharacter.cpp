@@ -3,14 +3,17 @@
 
 #include "PlayerCharacter.h"
 
+#include "GrapplingHook.h"
 #include "PlayerCharacterAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
 #include "RogueDoom/GameManager/RogueDoomGameInstance.h"
 #include "Weapon/GunWeapon.h"
+
 
 #pragma region Init
 APlayerCharacter::APlayerCharacter()
@@ -52,8 +55,8 @@ void APlayerCharacter::InitCamera()
 void APlayerCharacter::InitWeapon()
 {
 	const auto SocketTransform = GetMesh()->GetSocketTransform(TEXT("RightHandSocket"));
-	Weapon = GetWorld()->SpawnActor(AWeapon::StaticClass(),&SocketTransform);
-	Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("RightHandSocket"));
+	WeaponClass = GetWorld()->SpawnActor(AWeapon::StaticClass(),&SocketTransform);
+	WeaponClass->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("RightHandSocket"));
 }
 void APlayerCharacter::InitSetting()
 {
@@ -89,12 +92,12 @@ void APlayerCharacter::BeginPlay()
 		GameInstance->SetPlayerCharacter(this);
 	
 	InitWeapon();
-	
 }
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	HookPoint();
 }
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -103,8 +106,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//KeyboardAction
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::Fire);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);
+	PlayerInputComponent->BindAction("Hook", IE_Pressed, this, &APlayerCharacter::Hook);
 	
 	PlayerInputComponent->BindAction("Rifle", IE_Pressed, this, &APlayerCharacter::Rifle);
 	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &APlayerCharacter::Pistol);
@@ -114,6 +117,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//KeyboardAxis
 	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("Move Right / Left", this, &APlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("Fire", this, &APlayerCharacter::Fire);
 
 	//MouseAxis
 	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APlayerCharacter::TurnAtRate);
@@ -166,40 +170,141 @@ void APlayerCharacter::MoveRight(float Value)
 
 
 #pragma region Weapon
-void APlayerCharacter::Fire()
+void APlayerCharacter::Fire(float Rate)
 {
-	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
-		if(WeaponClass->GunWeapon->DoesSocketExist(TEXT("MuzzleSocket")))
-			WeaponClass->GunWeapon->Fire(WeaponClass->GunWeapon->GetSocketTransform(TEXT("MuzzleSocket")) + WeaponClass->MuzzleAccessory->GetAccessoryData().Transform);
+	if(const auto Weapon = Cast<AWeapon>(WeaponClass); Weapon && Rate > 0.0f)
+	{
+		if(Weapon->GunWeapon->DoesSocketExist(TEXT("MuzzleSocket")))
+		{
+			const auto Trace = LookAtCenterTarget();
+			FTransform MuzzleTransform = Weapon->GunWeapon->GetSocketTransform(TEXT("MuzzleSocket")) + Weapon->MuzzleAccessory->GetAccessoryData().Transform;
+			MuzzleTransform.SetRotation(GetActorRotation().Quaternion());
+			
+			Weapon->GunWeapon->Fire(*AnimInstance,MuzzleTransform, Trace.Get<0>(), Trace.Get<1>());
+		}
+	}
 }
 void APlayerCharacter::Reload()
 {
-	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
-		WeaponClass->GunWeapon->Reload();
+	if(const auto Weapon = Cast<AWeapon>(WeaponClass); Weapon)
+	{
+		Weapon->GunWeapon->Reload(*AnimInstance);
+	}
 }
 void APlayerCharacter::Rifle()
 {
-	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+	const auto Data = URifleWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();
+	if(const auto Weapon = Cast<AWeapon>(WeaponClass); Weapon && Weapon->GunWeapon->Data.Mesh != Data.Mesh)
 	{
 		AnimInstance->Data.WeaponType = EWeaponType::Rifle;
-		WeaponClass->GunWeapon->Data = URifleWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();		
-		ChangeWeapon(WeaponClass);
+		Weapon->GunWeapon->Data = Data;
+		AnimInstance->PlayRiflePullOutMontage();
+		ChangeWeapon(Weapon);
 	}
 }
 void APlayerCharacter::Pistol()
 {
-	if(const auto WeaponClass = Cast<AWeapon>(Weapon); WeaponClass)
+	const auto Data = UPistolWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();
+	if(const auto Weapon = Cast<AWeapon>(WeaponClass); Weapon && Weapon->GunWeapon->Data.Mesh != Data.Mesh)
 	{
 		AnimInstance->Data.WeaponType = EWeaponType::Pistol;
-		WeaponClass->GunWeapon->Data = UPistolWeapon::StaticClass()->GetDefaultObject<UGunWeapon>()->GetData();
-		ChangeWeapon(WeaponClass);
+		Weapon->GunWeapon->Data = Data;
+		AnimInstance->PlayRiflePullOutMontage();
+		ChangeWeapon(Weapon);
 	}
 }
-void APlayerCharacter::ChangeWeapon(const AWeapon* WeaponClass)const
+void APlayerCharacter::ChangeWeapon(const AWeapon* Weapon)const
 {
-	WeaponClass->ChangeAccessory(WeaponClass->ScopeAccessory, nullptr);
-	WeaponClass->ChangeAccessory(WeaponClass->LeftHandAccessory, nullptr);
-	WeaponClass->ChangeAccessory(WeaponClass->MuzzleAccessory, nullptr);
-	WeaponClass->GunWeapon->SetSkeletalMesh(WeaponClass->GunWeapon->Data.Mesh);
+	Weapon->ChangeAccessory(Weapon->ScopeAccessory, nullptr);
+	Weapon->ChangeAccessory(Weapon->LeftHandAccessory, nullptr);
+	Weapon->ChangeAccessory(Weapon->MuzzleAccessory, nullptr);
+	Weapon->GunWeapon->SetSkeletalMesh(Weapon->GunWeapon->Data.Mesh);
+	if(const auto GunWeapon = Cast<UGunWeapon>(Weapon->GunWeapon);GunWeapon)
+		GunWeapon->StopShooting();
 }
 #pragma endregion Weapon
+
+
+#pragma region OtherInput
+void APlayerCharacter::Hook()
+{
+	if(!HookClass)
+	{
+		HookClass = GetWorld()->SpawnActor(AGrapplingHook::StaticClass());
+		HookClass->SetActorTransform(GetActorTransform());
+
+		if(const auto Hook = Cast<AGrapplingHook>(HookClass); Hook)
+		{
+			Hook->Hook();
+			if(!Hook->bIsHooking)
+			{
+				HookClass->Destroy();
+				HookClass = nullptr;
+			}
+		}
+	}
+}
+#pragma endregion OtherInput
+
+
+#pragma region Function
+#pragma region LookAt
+TPair<FVector, FVector> APlayerCharacter::LookAtCenterTarget() const
+{
+	const FVector2D ScreenCenter = FindScreenCenter();
+
+	FVector TraceStartLocation;
+	FVector CameraDirection;
+	DeProjectScreenPositionToWorld(ScreenCenter.X, ScreenCenter.Y, TraceStartLocation, CameraDirection);
+	const FVector TraceEndLocation = TraceStartLocation + CameraDirection * 1500.0f;
+
+	LookAt(TraceEndLocation);
+
+	return TPair<FVector, FVector>(TraceStartLocation, TraceEndLocation);
+}
+FVector2D APlayerCharacter::FindScreenCenter() const
+{
+	const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	int32 ViewportSizeX, ViewportSizeY;
+	PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+	
+	return FVector2D(ViewportSizeX * 0.5f, ViewportSizeY * 0.5f);
+}
+void APlayerCharacter::DeProjectScreenPositionToWorld(const float ScreenX, const float ScreenY, FVector& WorldLocation, FVector& WorldDirection)const
+{
+	const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	PlayerController->DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldLocation, WorldDirection);
+}
+void APlayerCharacter::LookAt(const FVector Target)const
+{
+	const auto Player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	const float Yaw = UKismetMathLibrary::FindLookAtRotation(Player->GetActorLocation(), Target).Yaw;
+	Player->SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
+}
+#pragma endregion LookAt
+
+
+#pragma region Hook
+void APlayerCharacter::HookPoint()
+{
+	const FVector2D ScreenCenter = FindScreenCenter();
+
+	FVector TraceStartLocation;
+	FVector CameraDirection;
+	DeProjectScreenPositionToWorld(ScreenCenter.X, ScreenCenter.Y, TraceStartLocation, CameraDirection);
+	const FVector TraceEndLocation = TraceStartLocation + CameraDirection * 1500.0f;
+	
+	TraceStartLocation = TraceStartLocation + CameraDirection * 200.0f;	
+
+	FHitResult HitResult;
+	GetWorld()->SweepSingleByChannel(HitResult,TraceStartLocation,TraceEndLocation,FQuat::Identity,
+		ECollisionChannel::ECC_Visibility,FCollisionShape::MakeCapsule(30,0));
+	if(HitResult.bBlockingHit)
+		DrawDebugPoint(GetWorld(),HitResult.ImpactPoint,30.0f,FColor::Purple,false,0.1f);
+}
+#pragma endregion Hook
+
+
+
+#pragma endregion 

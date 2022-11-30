@@ -18,6 +18,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	USkeletalMesh* Mesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UParticleSystem* FireEffect;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FString Info;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FTransform Transform;
@@ -40,8 +42,8 @@ class IWeaponInterface
 public:
 	virtual FGunData GetData() = 0;
 	virtual void Display() = 0;
-	virtual void Fire(const FTransform Muzzle) = 0;
-	virtual void Reload() = 0;
+	virtual void Fire(class UPlayerCharacterAnimInstance& AnimInstance, const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation) = 0;
+	virtual void Reload(UPlayerCharacterAnimInstance& AnimInstance) = 0;
 };
 
 UCLASS()
@@ -72,16 +74,20 @@ class ROGUEDOOM_API UGunWeapon : public USkeletalMeshComponent, public IWeaponIn
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGunData Data;
+	
+	bool ShootAble = true;
 
 private:
-	bool ShootAble = true;
 	FTimerHandle ShootTimerHandle;
 	
 public:
 	virtual FGunData GetData() override {return FGunData{};}
 	virtual void Display() override {}
-	virtual void Fire(const FTransform Muzzle) override;
-	virtual void Reload() override {}
+	virtual void Fire(UPlayerCharacterAnimInstance& AnimInstance, const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation) override;
+	virtual void Reload(UPlayerCharacterAnimInstance& AnimInstance) override;
+
+	void HitEffect(const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation)const;
+	void StopShooting();
 };
 
 UCLASS()
@@ -96,8 +102,8 @@ public:
 
 	virtual FGunData GetData() override;
 	virtual void Display() override;
-	virtual void Fire(const FTransform Muzzle) override;
-	virtual void Reload() override {}
+	virtual void Fire(UPlayerCharacterAnimInstance& AnimInstance, const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation) override;
+	virtual void Reload(UPlayerCharacterAnimInstance& AnimInstance) override;
 };
 
 UCLASS()
@@ -112,6 +118,6 @@ public:
 
 	virtual FGunData GetData() override;
 	virtual void Display() override;
-	virtual void Fire(const FTransform Muzzle) override;
-	virtual void Reload() override {}
+	virtual void Fire(UPlayerCharacterAnimInstance& AnimInstance, const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation) override;
+	virtual void Reload(UPlayerCharacterAnimInstance& AnimInstance) override;
 };

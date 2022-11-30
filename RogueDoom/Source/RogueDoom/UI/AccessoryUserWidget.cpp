@@ -16,33 +16,33 @@ void UAccessoryUserWidget::NativeConstruct()
 
 void UAccessoryUserWidget::RedDot1ButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->ScopeAccessory, UTopRedDotScope1::StaticClass());
 }
 void UAccessoryUserWidget::RedDot2ButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->ScopeAccessory, UTopRedDotScope2::StaticClass());
 }
 void UAccessoryUserWidget::RedDot3ButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->ScopeAccessory, UTopRedDotScope3::StaticClass());
 }
 
 void UAccessoryUserWidget::AngledGripButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->LeftHandAccessory, UBottomAngledGrip::StaticClass());
 }
 
 void UAccessoryUserWidget::FlashHiderButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->MuzzleAccessory, UForwardFlashHider::StaticClass());
 }
 void UAccessoryUserWidget::SilencerButtonClicked()
 {
-	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->Weapon); Weapon)
+	if(const auto Weapon = Cast<AWeapon>(PlayerCharacter->WeaponClass); Weapon)
 		Weapon->ChangeAccessory(Weapon->MuzzleAccessory, UForwardSilencer::StaticClass());
 }

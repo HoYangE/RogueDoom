@@ -44,16 +44,33 @@ class ROGUEDOOM_API UPlayerCharacterAnimInstance final : public UAnimInstance
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn, Meta = (AllowPrivateAccess = true))
 	FData Data;
+	
 private:
-
+	UPROPERTY()
+	class APlayerCharacter* PlayerCharacter;
+	
+	UPROPERTY(BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
+	bool bLeftHandIK;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* FireMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* ReloadMontage;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montage, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* RiflePullOutMontage;
+	
+	FTimerHandle ReloadTimerHandle;
+	FTimerHandle RiflePullOutTimerHandle;
 	
 public:
-	
+	void PlayFireMontage();
+	void PlayReloadMontage();
+	void PlayRiflePullOutMontage();
 	
 private:
 	UPlayerCharacterAnimInstance();
 	
 	virtual void NativeUpdateAnimation(const float DeltaSeconds) override;
+	void UseLeftHandIK();
 
-	
 };
