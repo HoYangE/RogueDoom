@@ -34,7 +34,9 @@ void UPlayerCharacterAnimInstance::NativeUpdateAnimation(const float DeltaSecond
 	{
 		if(PlayerCharacter = Cast<APlayerCharacter>(Pawn); PlayerCharacter)
 			Data.IsInAir = PlayerCharacter->GetMovementComponent()->IsFalling();
-	}
+		if(PlayerCharacter->GetMovementComponent()->Velocity == FVector::ZeroVector)
+			ChangeSpeedType(ESpeedType::Walk);
+	}	
 }
 
 void UPlayerCharacterAnimInstance::PlayFireMontage()
@@ -60,6 +62,15 @@ void UPlayerCharacterAnimInstance::PlayRiflePullOutMontage()
 	const float Time = Montage_Play(RiflePullOutMontage);
 	GetWorld()->GetTimerManager().SetTimer(RiflePullOutTimerHandle, this, &UPlayerCharacterAnimInstance::UseLeftHandIK, Time);
 }
+
+
+void UPlayerCharacterAnimInstance::ChangeSpeedType(const ESpeedType SpeedType)
+{
+	Data.SpeedType = SpeedType;
+	PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = static_cast<int>(Data.SpeedType) * 100 + 600;
+}
+
+
 void UPlayerCharacterAnimInstance::UseLeftHandIK()
 {
 	bLeftHandIK = true;

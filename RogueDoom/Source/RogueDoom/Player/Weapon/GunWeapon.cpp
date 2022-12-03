@@ -6,6 +6,7 @@
 #include "Accessory.h"
 #include "CollisionDebugDrawingPublic.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
 #include "RogueDoom/GameManager/RogueDoomGameInstance.h"
 #include "RogueDoom/Player/PlayerCharacter.h"
@@ -71,7 +72,7 @@ void UGunWeapon::Fire(UPlayerCharacterAnimInstance& AnimInstance, const FTransfo
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Data.FireEffect, Muzzle);
 
 		AnimInstance.PlayFireMontage();
-		HitEffect(Muzzle, TraceStartLocation, TraceEndLocation);
+		HitCheck(Muzzle, TraceStartLocation, TraceEndLocation);
 		
 		Data.CurrentBullet--;
 		
@@ -89,21 +90,40 @@ void UGunWeapon::Reload(UPlayerCharacterAnimInstance& AnimInstance)
 	AnimInstance.PlayReloadMontage();
 	Data.CurrentBullet = Data.MaxBullet;
 }
-void UGunWeapon::HitEffect(const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation)const
+void UGunWeapon::HitCheck(const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation)const
 {
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStartLocation, TraceEndLocation, ECC_Visibility);
 	if(HitResult.bBlockingHit)
 	{
+		FCollisionQueryParams Params;
+		Params.bReturnPhysicalMaterial = true;
 		FHitResult HitResult2;
-		GetWorld()->LineTraceSingleByChannel(HitResult2, Muzzle.GetLocation(), HitResult.ImpactPoint + HitResult.ImpactNormal*-1.1f, ECC_Visibility);
+		GetWorld()->LineTraceSingleByChannel(HitResult2, Muzzle.GetLocation(), HitResult.ImpactPoint + HitResult.ImpactNormal*-1.1f, ECC_Visibility, Params);
 		if(HitResult2.bBlockingHit)
 		{
-			auto HitEffect = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/FX/P_Impact_Metal_Medium_01.P_Impact_Metal_Medium_01"));
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult2.ImpactPoint);
+			SpawnHitEffect(HitResult2);
+		
+			UGameplayStatics::ApplyPointDamage(HitResult2.GetActor(),FMath::RandRange(Data.MinDamage,Data.MaxDamage), HitResult2.ImpactPoint, HitResult2,
+				GetWorld()->GetFirstPlayerController()->GetPawn()->GetInstigatorController(), GetWorld()->GetFirstPlayerController()->GetPawn(), UDamageType::StaticClass());
 		}
 	}
 }
+void UGunWeapon::SpawnHitEffect(const FHitResult HitResult)const
+{
+	UParticleSystem* Effect = nullptr;
+	if(HitResult.PhysMaterial.Get()->GetName().Compare(FString("PM_Metal")) == 0)
+		Effect = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/FX/P_Impact_Metal_Medium_01.P_Impact_Metal_Medium_01"));
+	else if(HitResult.PhysMaterial.Get()->GetName().Compare(FString("PM_Stone")) == 0)
+		Effect = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/FX/P_Impact_Stone_Medium_01.P_Impact_Stone_Medium_01"));
+	else if(HitResult.PhysMaterial.Get()->GetName().Compare(FString("PM_Wood")) == 0)
+		Effect = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/FX/P_Impact_Wood_Medium_01.P_Impact_Wood_Medium_01"));
+	else
+		Effect = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/StartData/MilitaryWeapSilver/FX/P_Impact_Metal_Medium_01.P_Impact_Metal_Medium_01"));
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Effect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+}
+
 void UGunWeapon::StopShooting()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ShootTimerHandle);
@@ -123,6 +143,8 @@ FGunData URifleWeapon::GetData()
 	Data.Info = "Rifle";
 	Data.Transform = FTransform(FRotator(0, 90, 15), FVector(-7, 3, 0), FVector(1, 1, 1));
 	Data.DelayTime = 0.15f;
+	Data.MinDamage = 15;
+	Data.MaxDamage = 20;
 	Data.MaxBullet = 30;
 	Data.CurrentBullet = Data.MaxBullet;
 	
@@ -156,6 +178,8 @@ FGunData UPistolWeapon::GetData()
 	Data.Info = "Pistol";
 	Data.Transform = FTransform(FRotator(0, 90, 15), FVector(-7, 3, 0), FVector(1, 1, 1));
 	Data.DelayTime = 0.5f;
+	Data.MinDamage = 7;
+	Data.MaxDamage = 10;
 	Data.MaxBullet = 15;
 	Data.CurrentBullet = Data.MaxBullet;
 	

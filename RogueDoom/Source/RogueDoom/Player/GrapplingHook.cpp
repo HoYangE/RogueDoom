@@ -19,9 +19,9 @@ AGrapplingHook::AGrapplingHook()
 	
 	SplineInit();
 
-	if(const ConstructorHelpers::FObjectFinder<UCurveFloat> HookMoveCurveFloat(TEXT("/Game/DataSet/HookMove.HookMove")); HookMoveCurveFloat.Succeeded())
+	if(const ConstructorHelpers::FObjectFinder<UCurveFloat> HookMoveCurveFloat(TEXT("/Game/DataSet/Curves/HookMove.HookMove")); HookMoveCurveFloat.Succeeded())
 		HookMoveCurve = HookMoveCurveFloat.Object;
-	if(const ConstructorHelpers::FObjectFinder<UCurveFloat> HookPlayerMoveCurveFloat(TEXT("/Game/DataSet/HookPlayerMove.HookPlayerMove")); HookPlayerMoveCurveFloat.Succeeded())
+	if(const ConstructorHelpers::FObjectFinder<UCurveFloat> HookPlayerMoveCurveFloat(TEXT("/Game/DataSet/Curves/HookPlayerMove.HookPlayerMove")); HookPlayerMoveCurveFloat.Succeeded())
 		HookPlayerMoveCurve = HookPlayerMoveCurveFloat.Object;
 	
 	HookMoveCurveFloatValue = 0.0f;

@@ -66,7 +66,8 @@ public:
 	void PlayFireMontage();
 	void PlayReloadMontage();
 	void PlayRiflePullOutMontage();
-	
+
+	void ChangeSpeedType(const ESpeedType SpeedType);
 private:
 	UPlayerCharacterAnimInstance();
 	

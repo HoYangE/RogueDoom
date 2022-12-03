@@ -56,7 +56,8 @@ private:
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-
+	void ChangeSpeedEnum();
+	
 	void Fire(float Rate);
 	void Reload();
 	void Rifle();

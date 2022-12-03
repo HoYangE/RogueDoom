@@ -29,6 +29,10 @@ public:
 	int MaxBullet;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int CurrentBullet;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MinDamage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MaxDamage;
 };
 
 UINTERFACE()
@@ -85,8 +89,9 @@ public:
 	virtual void Display() override {}
 	virtual void Fire(UPlayerCharacterAnimInstance& AnimInstance, const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation) override;
 	virtual void Reload(UPlayerCharacterAnimInstance& AnimInstance) override;
-
-	void HitEffect(const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation)const;
+	
+	void HitCheck(const FTransform Muzzle, const FVector TraceStartLocation,  const FVector TraceEndLocation)const;
+	void SpawnHitEffect(const FHitResult HitResult)const;
 	void StopShooting();
 };
 
