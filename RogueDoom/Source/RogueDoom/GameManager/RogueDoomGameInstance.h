@@ -20,13 +20,16 @@ public:
 private:
 	UPROPERTY()
 	class APlayerCharacter* PlayerCharacter;
-
+	UPROPERTY()
+	UObject* Map;
 	
 public:
+	URogueDoomGameInstance();
+	
 	APlayerCharacter* GetPlayerCharacter()const{return PlayerCharacter;}
 	void SetPlayerCharacter(APlayerCharacter* NewPlayerCharacter){PlayerCharacter = NewPlayerCharacter;}
 	
-
+	virtual void Init() override;
 private:
 	
 };

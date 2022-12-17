@@ -12,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
 #include "RogueDoom/GameManager/RogueDoomGameInstance.h"
+#include "RogueDoom/LevelManager/LevelRoomSearchTree.h"
 #include "Weapon/GunWeapon.h"
 
 
@@ -70,7 +71,7 @@ void APlayerCharacter::InitSetting()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 
 	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.15f;
+	GetCharacterMovement()->AirControl = 0.0f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;

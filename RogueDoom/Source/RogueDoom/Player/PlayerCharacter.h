@@ -29,7 +29,6 @@ public:
 	AActor* HookClass;
 	
 private:
-
 	
 public:
 	TPair<FVector, FVector> LookAtCenterTarget()const;
