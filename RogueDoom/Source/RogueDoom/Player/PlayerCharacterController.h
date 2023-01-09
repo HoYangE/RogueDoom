@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class ROGUEDOOM_API APlayerCharacterController : public APlayerController
+class ROGUEDOOM_API APlayerCharacterController final : public APlayerController
 {
 	GENERATED_BODY()
 

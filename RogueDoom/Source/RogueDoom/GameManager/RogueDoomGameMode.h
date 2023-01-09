@@ -7,7 +7,7 @@
 #include "RogueDoomGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ARogueDoomGameMode : public AGameModeBase
+class ARogueDoomGameMode final : public AGameModeBase
 {
 	GENERATED_BODY()
 

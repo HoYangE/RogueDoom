@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class ROGUEDOOM_API AGrapplingHook : public AActor
+class ROGUEDOOM_API AGrapplingHook final : public AActor
 {
 	GENERATED_BODY()
 

@@ -12,7 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "RogueDoom/GameManager/RogueDoom.h"
 #include "RogueDoom/GameManager/RogueDoomGameInstance.h"
-#include "RogueDoom/LevelManager/LevelRoomSearchTree.h"
+#include "RogueDoom/LevelManager/RoomActor.h"
 #include "Weapon/GunWeapon.h"
 
 
@@ -110,6 +110,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::Reload);
 	PlayerInputComponent->BindAction("Hook", IE_Pressed, this, &APlayerCharacter::Hook);
 	PlayerInputComponent->BindAction("ChangeSpeedEnum", IE_Pressed, this, &APlayerCharacter::ChangeSpeedEnum);
+	PlayerInputComponent->BindAction("OpenDoor", IE_Pressed, this, &APlayerCharacter::OpenDoor);
 
 	PlayerInputComponent->BindAction("Rifle", IE_Pressed, this, &APlayerCharacter::Rifle);
 	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &APlayerCharacter::Pistol);
@@ -254,6 +255,22 @@ void APlayerCharacter::Hook()
 				HookClass->Destroy();
 				HookClass = nullptr;
 			}
+		}
+	}
+}
+void APlayerCharacter::OpenDoor()
+{
+	const auto Trace = LookAtCenterTarget();
+
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, Trace.Get<0>(), Trace.Get<1>(), ECC_Visibility);
+	if(HitResult.bBlockingHit)
+	{
+		if(const auto Temp = Cast<AWallActor>(HitResult.GetActor()); Temp)
+		{
+			Temp->DeleteDoor();
+			const auto GameInstance = Cast<URogueDoomGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+			GameInstance->ChangeRoom(Temp->RoomPosition);
 		}
 	}
 }

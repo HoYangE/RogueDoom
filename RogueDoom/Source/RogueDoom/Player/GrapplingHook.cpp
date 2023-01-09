@@ -102,8 +102,8 @@ void AGrapplingHook::HookMove()
 void AGrapplingHook::HookMoveEnd()
 {
 	GetWorld()->GetTimerManager().ClearTimer(HookMoveTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(HookPlayerMoveTimerHandle,this,&AGrapplingHook::HookPlayerMove,GetWorld()->DeltaTimeSeconds,true);
 	HookMoveCurveFloatValue = 0.0f;
+	GetWorld()->GetTimerManager().SetTimer(HookPlayerMoveTimerHandle,this,&AGrapplingHook::HookPlayerMove,GetWorld()->DeltaTimeSeconds,true);
 }
 void AGrapplingHook::HookPlayerMove()
 {

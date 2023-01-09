@@ -51,7 +51,7 @@ public:
 };
 
 UCLASS()
-class ROGUEDOOM_API AWeapon : public AActor
+class ROGUEDOOM_API AWeapon final : public AActor
 {
 	GENERATED_BODY()
 public:

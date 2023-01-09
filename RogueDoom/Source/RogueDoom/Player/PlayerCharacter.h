@@ -8,7 +8,7 @@
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class ROGUEDOOM_API APlayerCharacter : public ACharacter
+class ROGUEDOOM_API APlayerCharacter final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -65,4 +65,6 @@ private:
 
 	void Hook();
 	void HookPoint();
+
+	void OpenDoor();
 };
